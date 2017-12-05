@@ -11,9 +11,9 @@ function pluralOrSingular(data, locale) {
   }
   const count = Math.round(data)
   if (Array.isArray(locale)) {
-    return count > 1
-      ? locale[1].replace(/%s/, count)
-      : locale[0].replace(/%s/, count)
+    return count > 1 ?
+      locale[1].replace(/%s/, count) :
+      locale[0].replace(/%s/, count)
   }
   return locale.replace(/%s/, count)
 }
@@ -24,8 +24,11 @@ function formatTime(time) {
 }
 
 export default function install(
-  Vue,
-  { name = 'timeago', locale = 'en-US', locales = null } = {}
+  Vue, {
+    name = 'timeago',
+    locale = 'en-US',
+    locales = null
+  } = {}
 ) {
   if (!locales || Object.keys(locales).length === 0) {
     throw new TypeError('Expected locales to have at least one locale.')
@@ -64,42 +67,42 @@ export default function install(
           return null
         }
 
-        return this.format
-          ? this.format(this.sinceTime)
-          : formatTime(this.sinceTime)
+        return this.format ?
+          this.format(this.sinceTime) :
+          formatTime(this.sinceTime)
       },
       timeago() {
         const seconds = this.now / 1000 - this.sinceTime / 1000
 
         if (this.maxTime && seconds > this.maxTime) {
           clearInterval(this.interval)
-          return this.format
-            ? this.format(this.sinceTime)
-            : formatTime(this.sinceTime)
+          return this.format ?
+            this.format(this.sinceTime) :
+            formatTime(this.sinceTime)
         }
 
         const ret =
-          seconds <= 5
-            ? pluralOrSingular('just now', this.currentLocale[0])
-            : seconds < MINUTE
-              ? pluralOrSingular(seconds, this.currentLocale[1])
-              : seconds < HOUR
-                ? pluralOrSingular(seconds / MINUTE, this.currentLocale[2])
-                : seconds < DAY
-                  ? pluralOrSingular(seconds / HOUR, this.currentLocale[3])
-                  : seconds < WEEK
-                    ? pluralOrSingular(seconds / DAY, this.currentLocale[4])
-                    : seconds < MONTH
-                      ? pluralOrSingular(seconds / WEEK, this.currentLocale[5])
-                      : seconds < YEAR
-                        ? pluralOrSingular(
-                            seconds / MONTH,
-                            this.currentLocale[6]
-                          )
-                        : pluralOrSingular(
-                            seconds / YEAR,
-                            this.currentLocale[7]
-                          )
+          seconds <= 5 ?
+          pluralOrSingular('just now', this.currentLocale[0]) :
+          seconds < MINUTE ?
+          pluralOrSingular(seconds, this.currentLocale[1]) :
+          seconds < HOUR ?
+          pluralOrSingular(seconds / MINUTE, this.currentLocale[2]) :
+          seconds < DAY ?
+          pluralOrSingular(seconds / HOUR, this.currentLocale[3]) :
+          seconds < WEEK ?
+          pluralOrSingular(seconds / DAY, this.currentLocale[4]) :
+          seconds < MONTH ?
+          pluralOrSingular(seconds / WEEK, this.currentLocale[5]) :
+          seconds < YEAR ?
+          pluralOrSingular(
+            seconds / MONTH,
+            this.currentLocale[6]
+          ) :
+          pluralOrSingular(
+            seconds / YEAR,
+            this.currentLocale[7]
+          )
 
         return ret
       }
@@ -111,12 +114,11 @@ export default function install(
     },
     render(h) {
       return h(
-        'time',
-        {
+        'time', {
           attrs: {
             datetime: new Date(this.since),
             title: this.timeForTitle
-        },
+          },
           class: {
             textGreen: this.timeago === 'just now' || this.timeago === 'acum'
           }
