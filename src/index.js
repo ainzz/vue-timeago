@@ -116,6 +116,9 @@ export default function install(
           attrs: {
             datetime: new Date(this.since),
             title: this.timeForTitle
+        },
+          class: {
+            textGreen: this.timeago === 'just now' || this.timeago === 'acum'
           }
         },
         this.timeago
