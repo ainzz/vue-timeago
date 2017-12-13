@@ -1,15 +1,21 @@
-const MINUTE = 60
-const HOUR = MINUTE * 60
-const DAY = HOUR * 24
-const WEEK = DAY * 7
-const MONTH = DAY * 30
-const YEAR = DAY * 365
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.VueTimeago = factory());
+}(this, (function () { 'use strict';
+
+var MINUTE = 60;
+var HOUR = MINUTE * 60;
+var DAY = HOUR * 24;
+var WEEK = DAY * 7;
+var MONTH = DAY * 30;
+var YEAR = DAY * 365;
 
 function pluralOrSingular(data, locale) {
   if (data === 'just now') {
     return locale
   }
-  const count = Math.round(data)
+  var count = Math.round(data);
   if (Array.isArray(locale)) {
     return count > 1
       ? locale[1].replace(/%s/, count)
@@ -19,19 +25,24 @@ function pluralOrSingular(data, locale) {
 }
 
 function formatTime(time) {
-  const d = new Date(time)
+  var d = new Date(time);
   return d.toLocaleString()
 }
 
-export default function install(
+function install(
   Vue,
-  { name = 'timeago', locale = 'en-US', locales = null } = {}
+  ref
 ) {
+  if ( ref === void 0 ) ref = {};
+  var name = ref.name; if ( name === void 0 ) name = 'timeago';
+  var locale = ref.locale; if ( locale === void 0 ) locale = 'en-US';
+  var locales = ref.locales; if ( locales === void 0 ) locales = null;
+
   if (!locales || Object.keys(locales).length === 0) {
     throw new TypeError('Expected locales to have at least one locale.')
   }
 
-  const VueTimeago = {
+  var VueTimeago = {
     props: {
       since: {
         required: true
@@ -41,24 +52,24 @@ export default function install(
       autoUpdate: Number,
       format: Function
     },
-    data() {
+    data: function data() {
       return {
         now: new Date().getTime()
       }
     },
     computed: {
-      currentLocale() {
-        const current = locales[this.locale || locale]
+      currentLocale: function currentLocale() {
+        var current = locales[this.locale || locale];
         if (!current) {
           return locales[locale]
         }
         return current
       },
-      sinceTime() {
+      sinceTime: function sinceTime() {
         return new Date(this.since).getTime()
       },
-      timeForTitle() {
-        const seconds = this.now / 1000 - this.sinceTime / 1000
+      timeForTitle: function timeForTitle() {
+        var seconds = this.now / 1000 - this.sinceTime / 1000;
 
         if (this.maxTime && seconds > this.maxTime) {
           return null
@@ -68,17 +79,17 @@ export default function install(
           ? this.format(this.sinceTime)
           : formatTime(this.sinceTime)
       },
-      timeago() {
-        const seconds = this.now / 1000 - this.sinceTime / 1000
+      timeago: function timeago() {
+        var seconds = this.now / 1000 - this.sinceTime / 1000;
 
         if (this.maxTime && seconds > this.maxTime) {
-          clearInterval(this.interval)
+          clearInterval(this.interval);
           return this.format
             ? this.format(this.sinceTime)
             : formatTime(this.sinceTime)
         }
 
-        const ret =
+        var ret =
           seconds <= 5
             ? pluralOrSingular('just now', this.currentLocale[0])
             : seconds < MINUTE
@@ -99,17 +110,17 @@ export default function install(
                         : pluralOrSingular(
                             seconds / YEAR,
                             this.currentLocale[7]
-                          )
+                          );
 
         return ret
       }
     },
-    mounted() {
+    mounted: function mounted() {
       if (this.autoUpdate) {
-        this.update()
+        this.update();
       }
     },
-    render(h) {
+    render: function render(h) {
       return h(
         'time',
         {
@@ -125,31 +136,37 @@ export default function install(
       )
     },
     watch: {
-      autoUpdate(newAutoUpdate) {
-        this.stopUpdate()
+      autoUpdate: function autoUpdate(newAutoUpdate) {
+        this.stopUpdate();
         // only update when it's not falsy value
         // which means you cans set it to 0 to disable auto-update
         if (newAutoUpdate) {
-          this.update()
+          this.update();
         }
       }
     },
     methods: {
-      update() {
-        const period = this.autoUpdate * 1000
-        this.interval = setInterval(() => {
-          this.now = new Date().getTime()
-        }, period)
+      update: function update() {
+        var this$1 = this;
+
+        var period = this.autoUpdate * 1000;
+        this.interval = setInterval(function () {
+          this$1.now = new Date().getTime();
+        }, period);
       },
-      stopUpdate() {
-        clearInterval(this.interval)
-        this.interval = null
+      stopUpdate: function stopUpdate() {
+        clearInterval(this.interval);
+        this.interval = null;
       }
     },
-    beforeDestroy() {
-      this.stopUpdate()
+    beforeDestroy: function beforeDestroy() {
+      this.stopUpdate();
     }
-  }
+  };
 
-  Vue.component(name, VueTimeago)
+  Vue.component(name, VueTimeago);
 }
+
+return install;
+
+})));
